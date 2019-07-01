@@ -35,20 +35,29 @@ const handleRegister = (req, res, db, bcrypt) => {
               living_budget: 0,
               ticket_budget: 0,
               shopping_budget: 0,
-              user_id: user[0].id
+              user_id: user[0].id,
+              traffic_expense: 0,
+              food_expense: 0,
+              living_expense: 0,
+              ticket_expense: 0,
+              shopping_expense: 0
             })
             .then(journeys =>{
-              console.log(journeys);
               journeys[0].accountList = [];
               data.push(journeys[0]);
               return trx('accounts')
                 .returning('*')
                 .insert({
                   name: 'Day1',
-                  journey_id: journeys[0].id
+                  journey_id: journeys[0].id,
+                  total_amount: 0,
+                  traffic_amount: 0,
+                  food_amount: 0,
+                  living_amount: 0,
+                  ticket_amount: 0,
+                  shopping_amount: 0
                 })
                 .then( accounts => {
-                  console.log(accounts);
                   accounts[0].expenseList = [];
                   data[0].accountList.push(accounts[0]);
                   userData = Object.assign({}, {

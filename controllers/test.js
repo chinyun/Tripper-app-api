@@ -1,47 +1,24 @@
 const test = (req, res, db) => {
-  const datas = [];
-  db.select('id').from('journeys')
-    .where('user_id', '=', req.body.user_id )
-    .then(journeys => {
-      journeys.map((journey) => {
-        journey.accountList = [];
-        return datas.push(journey);
-      })
-      db.select('*').from('accounts')
-        .whereIn('journey_id', function() {
-          this.select('id').from('journeys');
+  db.select('category','account_id').sum('amount as food_amount')
+    .from('expenses')
+    .where('category', '=', '飲食').andWhere('account_id', '=', req.body.account_id)
+    .groupBy('category','account_id')
+    .then(data =>{
+      db('accounts').where({id: data[0].account_id})
+        .update('food_amount', data[0].food_amount)
+        .returning('*')
+        .then(account => {
+          res.json(account)
         })
-        .then(accounts => {
-          accounts.map((account) => {
-            account.expenseList = [];
-            datas.map((item) => {
-              if(account.journey_id === item.id) {
-                item.accountList.push(account);
-              }
-            })
-          });
-          db.select('*').from('expenses')
-            .whereIn('account_id', function(accounts) {
-              this.select('id').from('accounts');
-            })
-            .then(expenses => {
-              // needs to optimize ?
-              expenses.map((expense) => {
-                datas.map((data) => {
-                  data.accountList.map((item) =>{
-                    if(expense.account_id === item.id) {
-                      item.expenseList.push(expense)
-                    }
-                  })
-                })
-              });
-              res.json(datas);
-            })
-            .catch(err => res.status(400).json('error getting expenses'));
-        })
-        .catch(err => res.status(400).json('error getting accounts'));
+        .catch(err => res.status(400).json('unable to get account'))
     })
-    .catch(err => res.status(400).json('error getting journeys'));
+    .catch(err => res.status(400).json('unable to get data'));
+  // db('expenses').sum({totalAmount: 'amount'})
+  //   .where('account_id', '=', req.body.account_id)
+  //   .then(data => {
+  //     res.json(data);
+  //   })
+  //   .catch(err => res.status(400).json('unable to get data'))
 };
 
 module.exports = {

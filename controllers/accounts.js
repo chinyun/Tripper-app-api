@@ -3,7 +3,13 @@ const components = require('./components');
 const handlePostAccount = (req, res, db) => {
   db('accounts').insert({
       name: req.body.name,
-      journey_id: req.body.journey_id
+      journey_id: req.body.journey_id,
+      total_amount: 0,
+      traffic_amount: 0,
+      food_amount: 0,
+      living_amount: 0,
+      ticket_amount: 0,
+      shopping_amount: 0
     })
     .returning('journey_id')
     .then(journeyId => {

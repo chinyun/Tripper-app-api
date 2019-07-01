@@ -14,7 +14,12 @@ const handlePostJourney = (req, res, db) => {
           living_budget: req.body.living_budget,
           ticket_budget: req.body.ticket_budget,
           shopping_budget: req.body.shopping_budget,
-          user_id: req.body.user_id
+          user_id: req.body.user_id,
+          traffic_expense: 0,
+          food_expense: 0,
+          living_expense: 0,
+          ticket_expense: 0,
+          shopping_expense: 0
         })
         .into('journeys')
         .returning('id')
@@ -23,7 +28,13 @@ const handlePostJourney = (req, res, db) => {
             .returning('*')
             .insert({
               journey_id: journeyId[0],
-              name: 'Day1'
+              name: 'Day1',
+              total_amount: 0,
+              traffic_amount: 0,
+              food_amount: 0,
+              living_amount: 0,
+              ticket_amount: 0,
+              shopping_amount: 0
             })
             .then(accounts => {
               return trx('journeys')
@@ -72,7 +83,6 @@ const handleDeleteJourney = (req, res, db) => {
     .del()
     .returning('*')
     .then(delJourney => {
-      console.log(delJourney);
       const data = [];
       db.select('*').from('journeys')
         .where('user_id', '=', delJourney[0].user_id)
@@ -83,7 +93,7 @@ const handleDeleteJourney = (req, res, db) => {
           });
           components.handleUpdateJourney(req, res, db, data);
         })
-        .catch(err => res.status(400).json('unable to get data'))
+        .catch(err => res.status(400).json('error getting data'))
     })
     .catch(err => res.status(400).json('unable to delete journey'))
 };

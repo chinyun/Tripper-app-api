@@ -41,6 +41,39 @@ const handleUpdateJourney = (req, res, db, data, user) => {
     .catch(err => res.status(400).json('error getting accountList'))
 }
 
+// const handleUpdateFoodAmount = {
+//   trx('expenses').select('category', 'account_id')
+//     .sum('amount as food_amount')
+//     .where('category', '=', '飲食')
+//     .andWhere('account_id', '=', accountId[0])
+//     .groupBy('category','account_id')
+//     .then(data =>{
+//       trx('accounts').where({id: data[0].account_id})
+//         .update('food_amount', data[0].food_amount)
+//         .returning('*')
+//         .then(account => {
+//           res.json(account)
+//         })
+//         .then(trx.commit)
+//         .catch(trx.rollback);     
+//     })
+// }
+
+// const handleUpdateTrafficAmount = {
+//   trx('expenses').select('category', 'account_id')
+//     .sum('amount as traffic_amount')
+//     .where('category', '=', '交通')
+//     .andWhere('account_id', '=', accountId[0])
+//     .groupBy('category','account_id')
+//     .then(data =>{
+//       trx('accounts').where({id: data[0].account_id})
+//         .update('traffic_amount', data[0].food_amount)
+//         .then(trx.commit)
+//         .catch(trx.rollback);     
+//     })
+// }
+
+
 module.exports = {
   handleUpdateJourney
 };

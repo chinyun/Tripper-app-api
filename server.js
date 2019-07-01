@@ -10,6 +10,7 @@ const register = require('./controllers/register');
 const journeys = require('./controllers/journeys');
 const accounts = require('./controllers/accounts');
 const expenses = require('./controllers/expenses');
+const test = require('./controllers/test');
 
 const db = knex({
 	client: 'pg',
@@ -42,6 +43,8 @@ app.delete('/accounts/:id', (req, res) => { accounts.handleDeleteAccount(req, re
 app.post('/expenses', (req, res) => { expenses.handlePostExpense(req, res, db) });
 app.patch('/expenses/:id', (req, res) => { expenses.handlePatchExpense(req, res, db) });
 app.delete('/expenses/:id', (req, res) => { expenses.handleDeleteExpense(req, res, db) });
+
+app.get('/test', (req, res) => { test.test(req, res, db) });
 
 app.listen( 3000, ()=>{
 	console.log('app is running on 3000');
