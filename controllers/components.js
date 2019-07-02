@@ -41,39 +41,67 @@ const handleUpdateJourney = (req, res, db, data, user) => {
     .catch(err => res.status(400).json('error getting accountList'))
 }
 
-// const handleUpdateFoodAmount = {
-//   trx('expenses').select('category', 'account_id')
-//     .sum('amount as food_amount')
-//     .where('category', '=', '飲食')
-//     .andWhere('account_id', '=', accountId[0])
-//     .groupBy('category','account_id')
-//     .then(data =>{
-//       trx('accounts').where({id: data[0].account_id})
-//         .update('food_amount', data[0].food_amount)
-//         .returning('*')
-//         .then(account => {
-//           res.json(account)
-//         })
-//         .then(trx.commit)
-//         .catch(trx.rollback);     
-//     })
-// }
+const handleUpdateExpense = (req, res, db, updatedAmount, updatedExpense) => {
+  db.select('category','account_id').sum('amount as updated_amount')
+    .from('expenses').where('category', '=', req.body.category)
+    .andWhere('account_id', '=', req.body.account_id)
+    .groupBy('category','account_id')
+    .then(data => {
+      db('accounts').where({id:  data[0].account_id})
+        .update(`${updatedAmount}`, data[0].updated_amount)
+        .returning('id')
+        .then(accountId => {
 
-// const handleUpdateTrafficAmount = {
-//   trx('expenses').select('category', 'account_id')
-//     .sum('amount as traffic_amount')
-//     .where('category', '=', '交通')
-//     .andWhere('account_id', '=', accountId[0])
-//     .groupBy('category','account_id')
-//     .then(data =>{
-//       trx('accounts').where({id: data[0].account_id})
-//         .update('traffic_amount', data[0].food_amount)
-//         .then(trx.commit)
-//         .catch(trx.rollback);     
-//     })
-// }
+          db('expenses').sum('amount as total_amount')
+            .where('account_id', '=', accountId[0])
+            .then(data => {
+              db('accounts').where({id: accountId[0]})
+                .update('total_amount', data[0].total_amount)
+                .returning('journey_id')
+                .then(journeyId => {
+
+                  db('accounts').sum('total_amount as expense')
+                    .where('journey_id', '=', journeyId[0])
+                    .then(data => {
+                      db('journeys').where({id: journeyId[0]})
+                        .update('expense', data[0].expense)
+                        .returning('id')
+                        .then(journeyId => {
+
+                          db('accounts').sum(`${updatedAmount} as updated_expense`)
+                            .where('journey_id', '=', journeyId[0])
+                            .then(data => {
+                              db('journeys').where({id: journeyId[0]})
+                                .update(`${updatedExpense}`, data[0].updated_expense)
+                                .returning('*')
+                                .then(journey => {
+
+                                  const data = [];
+                                  journey.map(item => {
+                                    item.accountList = [];
+                                    return data.push(item);
+                                  })
+                                  handleUpdateJourney(req, res, db, data);
+                                })
+                                .catch(err => res.status(400).json('error getting journey'))
+                            })
+                            .catch(err => res.status(400).json(`error updating ${updatedExpense}`))
+                        })
+                        .catch(err => res.status(400).json(`error summing ${updatedAmount}`))
+                    })
+                    .catch(err => res.status(400).json('error updating expense'))
+                })
+                .catch(err => res.status(400).json('error summing amounts'))
+            })
+            .catch(err => res.status(400).json('error updating amount'))
+        })
+        .catch(err => res.status(400).json('error summing expenses'))
+    })
+    .catch(err => res.status(400).json('error getting amounts'))
+}
 
 
 module.exports = {
-  handleUpdateJourney
+  handleUpdateJourney,
+  handleUpdateExpense
 };

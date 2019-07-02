@@ -1,5 +1,27 @@
 const components = require('./components');
 
+const handleCategorySwitch = (req, res, db) => {
+  switch(req.body.category) {
+    case '交通':
+      return components.handleUpdateExpense(req, res, db,
+        updatedAmount='traffic_amount', updatedExpense='traffic_expense')
+    case '飲食':
+      return components.handleUpdateExpense(req, res, db,
+        updatedAmount='food_amount', updatedExpense='food_expense')
+    case '住宿':
+      return components.handleUpdateExpense(req, res, db,
+        updatedAmount='living_amount', updatedExpense='living_expense')
+    case '票券':
+      return components.handleUpdateExpense(req, res, db,
+        updatedAmount='ticket_amount', updatedExpense='ticket_expense')
+    case '購物':
+      return components.handleUpdateExpense(req, res, db,
+        updatedAmount='shopping_amount', updatedExpense='shopping_expense')
+    default:
+      return components.handleUpdateJourney(req, res, db)
+  }
+}
+
 const handlePostExpense = (req, res, db) => {
   db('expenses').insert({
       category: req.body.category,
@@ -9,98 +31,7 @@ const handlePostExpense = (req, res, db) => {
     })
     .returning('account_id')
     .then(accountId => {
-      db('expenses').sum('amount as total_amount')
-        .where('account_id', '=', accountId[0])
-        .then(data => {
-          db('accounts').where({id: accountId[0]})
-            .update('total_amount', data[0].total_amount)
-            .returning('id')
-            .then(accountId => {
-              db.select('category','account_id').sum('amount as traffic_amount')
-                .from('expenses')
-                .where('category', '=', '交通').andWhere('account_id', '=', accountId[0])
-                .groupBy('category','account_id')
-                .then(data => {
-                  db('accounts').where({id: data[0].account_id})
-                    .update('traffic_amount', data[0].traffic_amount)
-                    .returning('id')
-                    .then(accountId => {
-                      db.select('category','account_id').sum('amount as food_amount')
-                        .from('expenses')
-                        .where('category', '=', '飲食').andWhere('account_id', '=', accountId[0])
-                        .groupBy('category','account_id')
-                        .then(data => {
-                          db('accounts').where({id: data[0].account_id})
-                            .update('food_amount', data[0].food_amount)
-                            .returning('id')
-                            .then(accountId => {
-                              db.select('category','account_id').sum('amount as living_amount')
-                                .from('expenses')
-                                .where('category', '=', '住宿').andWhere('account_id', '=', accountId[0])
-                                .groupBy('category','account_id')
-                                .then(data => {
-                                  db('accounts').where({id: data[0].account_id})
-                                    .update('living_amount', data[0].living_amount)
-                                    .returning('id')
-                                    .then(accountId => {
-                                      db.select('category','account_id').sum('amount as ticket_amount')
-                                        .from('expenses')
-                                        .where('category', '=', '票券').andWhere('account_id', '=', accountId[0])
-                                        .groupBy('category','account_id')
-                                        .then(data => {
-                                          db('accounts').where({id: data[0].account_id})
-                                            .update('ticket_amount', data[0].ticket_amount)
-                                            .returning('id')
-                                            .then(accountId => {
-                                              db.select('category','account_id').sum('amount as shopping_amount')
-                                                .from('expenses')
-                                                .where('category', '=', '購物').andWhere('account_id', '=', accountId[0])
-                                                .groupBy('category','account_id')
-                                                .then(data => {
-                                                  db('accounts').where({id: data[0].account_id})
-                                                    .update('shopping_amount', data[0].shopping_amount)
-                                                    .returning('id')
-                                                    .then(accountId => {
-                                                      db.select('journey_id').from('accounts')
-                                                        .where('id', '=', accountId[0])
-                                                        .then(journeyId => {
-                                                          db.select('*').from('journeys')
-                                                          .where('id', '=', journeyId[0].journey_id)
-                                                          .then(journey => {
-                                                            const data = [];
-                                                            journey.map(item => {
-                                                              item.accountList = [];
-                                                              return data.push(item);
-                                                            })
-                                                            components.handleUpdateJourney(req, res, db, data);
-                                                          })
-                                                          .catch(err => res.status(400).json('error getting data'))
-                                                        })
-                                                        .catch(err => res.status(400).json('error getting journey'))
-                                                    })
-                                                    .catch(err => res.status(400).json('error getting account5'))
-                                                })
-                                                .catch(err => res.status(400).json('error getting shopping amount'))
-                                            })
-                                            .catch(err => res.status(400).json('error getting account4'))
-                                        })
-                                        .catch(err => res.status(400).json('error getting ticket amount'))
-                                    })
-                                    .catch(err => res.status(400).json('error getting account3'))
-                                })
-                                .catch(err => res.status(400).json('error getting living amount'))
-                            })
-                            .catch(err => res.status(400).json('error getting account2'))
-                        })
-                        .catch(err => res.status(400).json('error getting food amount'))
-                    })
-                    .catch(err => res.status(400).json('error getting account1'))
-                })
-                .catch(err => res.status(400).json('error getting traffic amount'));
-            })
-            .catch(err => res.status(400).json('error getting account'))
-        })
-        .catch(err => res.status(400).json('error getting total amount'))
+      handleCategorySwitch(req, res, db)
     })
     .catch(err => res.status(400).json('unable to create account'))
 }
@@ -110,48 +41,17 @@ const handlePatchExpense  = (req, res, db) => {
     .update(req.body)
     .returning('account_id')
     .then(accountId => {
-      db.select('journey_id').from('accounts')
-        .where('id', '=', accountId[0])
-        .then(journeyId => {
-          db.select('*').from('journeys')
-          .where('id', '=', journeyId[0].journey_id)
-          .then(journey => {
-            const data = [];
-            journey.map(item => {
-              item.accountList = [];
-              return data.push(item);
-            })
-            components.handleUpdateJourney(req, res, db, data);
-          })
-          .catch(err => res.status(400).json('error getting data'))
-        })
-        .catch(err => res.status(400).json('error getting journey'))
+      handleCategorySwitch(req, res, db)
     })
     .catch(err => res.status(400).json('unable to update expenses'))
 }
 
 const handleDeleteExpense = (req, res, db) => {
-  db('expenses')
-    .where('id', '=', req.params.id)
+  db('expenses').where('id', '=', req.params.id)
     .del()
     .returning('*')
-    .then(delExpense => {
-      const data = [];
-      db.select('journey_id').from('accounts')
-        .where('id', '=', delExpense[0].account_id)
-        .then(journeyId => {
-          db.select('*').from('journeys')
-            .where('id', '=', journeyId[0].journey_id)
-            .then(journey => {
-              journey.map((item) => {
-                item.accountList = [];
-                return data.push(item);
-              });
-              components.handleUpdateJourney(req, res, db, data);
-            })
-            .catch(err => res.status(400).json('error getting data'))
-        })
-        .catch(err => res.status(400).json('error getting journey'))
+    .then(data => {
+      handleCategorySwitch(req, res, db)
     })
     .catch(err => res.status(400).json('unable to delete expense'))
 } 
