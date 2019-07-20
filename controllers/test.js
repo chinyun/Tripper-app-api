@@ -13,12 +13,6 @@ const test = (req, res, db) => {
         .catch(err => res.status(400).json('unable to get account'))
     })
     .catch(err => res.status(400).json('unable to get data'));
-  // db('expenses').sum({totalAmount: 'amount'})
-  //   .where('account_id', '=', req.body.account_id)
-  //   .then(data => {
-  //     res.json(data);
-  //   })
-  //   .catch(err => res.status(400).json('unable to get data'))
 };
 
 module.exports = {

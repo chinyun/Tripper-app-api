@@ -100,7 +100,6 @@ const handleUpdateExpense = (req, res, db, updatedAmount, updatedExpense) => {
     .catch(err => res.status(400).json('error getting amounts'))
 }
 
-
 module.exports = {
   handleUpdateJourney,
   handleUpdateExpense
