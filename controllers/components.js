@@ -2,7 +2,7 @@ const handleUpdateJourney = (req, res, db, data, user) => {
   db.select('*').from('accounts')
     .whereIn('journey_id', function() {
       this.select('id').from('journeys')
-    })
+    }).orderBy('id', 'asc')
     .then(accounts => {
       accounts.map((account) => {
         account.expenseList = [];
@@ -15,7 +15,7 @@ const handleUpdateJourney = (req, res, db, data, user) => {
       db.select('*').from('expenses')
         .whereIn('account_id', function() {
           this.select('id').from('accounts')
-        })
+        }).orderBy('id', 'asc')
         .then(expenses => {
           expenses.map((expense) => {
             data.map((item) => {

@@ -27,7 +27,7 @@ const handleRegister = (req, res, db, bcrypt) => {
           return trx('journeys')
             .returning('*')
             .insert({
-              name: 'template',
+              name: 'Template',
               budget: 0,
               expense: 0,
               traffic_budget: 0,
