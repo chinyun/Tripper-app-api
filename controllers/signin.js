@@ -17,6 +17,7 @@ const handleSignin = (req, res, db, bcrypt) => {
           .then(user => { 
             db.select('*').from('journeys')
               .where('user_id', '=', user[0].id)
+              .orderBy('id', 'asc')
               .then(journeys => {
                 journeys.map((journey) =>{
                   journey.accountList = [];
