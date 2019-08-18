@@ -1,13 +1,12 @@
 {
   "name": "tripper-app-api",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon server.js"
   },
-  "author": "jinnychen",
+  "author": "chenchinyun",
   "license": "ISC",
   "dependencies": {
     "bcrypt-nodejs": "0.0.3",
