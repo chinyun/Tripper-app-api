@@ -2,30 +2,31 @@ const components = require('./components');
 
 const handlePostAccount = (req, res, db) => {
   db('accounts').insert({
-      name: req.body.name,
-      journey_id: req.body.journey_id,
-      total_amount: 0,
-      traffic_amount: 0,
-      food_amount: 0,
-      living_amount: 0,
-      ticket_amount: 0,
-      shopping_amount: 0
-    })
-    .returning('journey_id')
-    .then(journeyId => {
-      db.select('*').from('journeys')
-        .where('id', '=', journeyId[0])
-        .then(journey => {
-          const data = [];
-          journey.map(item => {
-            item.accountList = [];
-            return data.push(item);
-          })
-          components.handleUpdateJourney(req, res, db, data);
-        })
-        .catch(err => res.status(400).json('error getting journey'))
-    })
-    .catch(err => res.status(400).json('unable to create account'))
+    name: req.body.name,
+    journey_id: req.body.journey_id,
+    total_amount: 0,
+    traffic_amount: 0,
+    food_amount: 0,
+    living_amount: 0,
+    ticket_amount: 0,
+    shopping_amount: 0
+  })
+  .returning('journey_id')
+  .then(journeyId => {
+    db.select('*').from('journeys')
+      .where('id', '=', journeyId[0])
+      .then(journey => {
+        const data = [];
+        journey.map(item => {
+          item.accountList = [];
+          return data.push(item);
+        });
+
+        components.handleUpdateJourney(req, res, db, data);
+      })
+      .catch(err => res.status(400).json('error getting journey'))
+  })
+  .catch(err => res.status(400).json('unable to create account'))
 }
 
 const handleDeleteAccount = (req, res, db) => {
@@ -42,6 +43,7 @@ const handleDeleteAccount = (req, res, db) => {
             item.accountList = [];
             return data.push(item);
           });
+
           components.handleUpdateJourney(req, res, db, data);
         })
         .catch(err => res.status(400).json('unable to get data'))

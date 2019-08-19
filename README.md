@@ -1,11 +1,13 @@
 # Tripper-app-api
-**Tripper** is a web application that aims to help users arrange trip budget before or during the trip. This repo is the **backend** part of the entire app. Handle the server and database working. Built with **Node.js**, **Express.js** and **Knex.js**. The database used is **PostgreSQL**. The project is deployed to **[Heroku]()**.
+Tripper is a web application that aims to help users arrange trip budget before or during the trip. This repo is the **backend** part of the entire app. Handle the server and database working. Built with **Node.js**, **Express.js** and **Knex.js**. The database used is **PostgreSQL**.
+
+The project is deployed to **[Heroku]()**.
 
 ## Getting Started
 These instructions will get you a copy of the project up and running on your local machine.
 
 ### Prerequisites
-You will need to install **Node.js & npm & PostgreSQL** for this code base.
+You will need to install **[Node.js](https://nodejs.org/en/) & [npm](https://www.npmjs.com/) & [PostgreSQL](https://www.postgresql.org/)** for this code base.
  
 ### Installing
  Script to install the packages:
