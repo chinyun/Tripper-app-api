@@ -2,8 +2,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt-nodejs');
 const cors = require('cors');
-const pg = require('pg');
 const knex = require('knex');
+const pg = require('pg');
 
 const signin = require('./controllers/signin');
 const register = require('./controllers/register');
@@ -14,8 +14,8 @@ const expenses = require('./controllers/expenses');
 const db = knex({
   client: 'pg',
   connection: {
-    host: '127.0.0.1',
-    database: 'tripper-app-db'
+    connectionString: process.env.DATABASE_URL,
+    ssl: true,
   }
 });
 
@@ -41,6 +41,6 @@ app.post('/expenses', (req, res) => { expenses.handlePostExpense(req, res, db) }
 app.patch('/expenses/:id', (req, res) => { expenses.handlePatchExpense(req, res, db) });
 app.delete('/expenses/:id', (req, res) => { expenses.handleDeleteExpense(req, res, db) });
 
-app.listen( 3000, () => {
-	console.log('app is running on 3000');
-});
+app.listen( process.env.PORT || 3000, () => {
+	console.log(`app is running on port ${process.env.PORT}`);
+})
