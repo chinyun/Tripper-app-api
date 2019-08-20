@@ -1,7 +1,8 @@
 # Tripper-app-api
 Tripper is a web application that aims to help users arrange trip budget before or during the trip. This repo is the **backend** part of the entire app. Handle the server and database working. Built with **Node.js**, **Express.js** and **Knex.js**. The database used is **PostgreSQL**.
 
-The project is deployed to **[Heroku]()**.
+The app is already deployed on Heroku, you can view it at **[tripper-website](https://tripper-website.herokuapp.com)**.
+> Notes: this project is under optimizing and it is recommended not to use vital personal information to register or comunicate with the database.
 
 ## Getting Started
 These instructions will get you a copy of the project up and running on your local machine.
