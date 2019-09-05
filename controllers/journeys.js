@@ -86,6 +86,7 @@ const handleDeleteJourney = (req, res, db) => {
       const data = [];
       db.select('*').from('journeys')
         .where('user_id', '=', delJourney[0].user_id)
+        .orderBy('id', 'asc')
         .then(journeys => {
           journeys.map((journey) => {
             journey.accountList = [];
