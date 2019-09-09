@@ -60,9 +60,37 @@ const handlePatchJourney = (req, res, db) => {
     .update({ name: req.body.name })
     .returning('*')
     .then(data => {
-      const obj = Object.assign({}, { id: data[0].id, name: data[0].name });
-      data.push(obj);
-      res.json(data);
+      data[0].accountList = [];
+      db.select('*').from('accounts')
+        .where('journey_id', '=', req.params.id)
+        .orderBy('id', 'asc')
+        .then(accounts => {
+          const accountIdList = [];
+          accounts.map(account => {
+            account.expenseList = [];
+            accountIdList.push(account.id);
+            data[0].accountList.push(account);
+          });
+          
+          db.select('*').from('expenses')
+            .whereIn('account_id', accountIdList)
+            .orderBy('id', 'asc')
+            .then(expenses => {
+              expenses.map(expense => {
+                data[0].accountList.map(item => {
+                  if (expense.account_id === item.id) {
+                    item.expenseList.push(expense)
+                  }
+                })
+              });
+
+              const obj = Object.assign({}, { id: data[0].id, name: data[0].name });
+              data.push(obj);
+              res.json(data);
+            })
+            .catch(err => res.status(400).json('unable to get expenses'))
+        })
+        .catch(err => res.status(400).json('unable to get account'))
     })
     .catch(err => res.status(400).json('unable to update journey'));
 };

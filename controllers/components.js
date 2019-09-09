@@ -7,7 +7,7 @@ const handleUpdateJourney = (req, res, db, data, user) => {
       accounts.map((account) => {
         account.expenseList = [];
         data.map((item) => {
-          if(account.journey_id === item.id) {
+          if (account.journey_id === item.id) {
             item.accountList.push(account)
           }
         })
@@ -20,13 +20,13 @@ const handleUpdateJourney = (req, res, db, data, user) => {
           expenses.map((expense) => {
             data.map((item) => {
               item.accountList.map((account) => {
-                if(expense.account_id === account.id) {
+                if (expense.account_id === account.id) {
                   account.expenseList.push(expense)
                 }
               })
             })
           });
-          if(user !== undefined) {
+          if (user !== undefined) {
             userData = Object.assign({}, {
               id: user[0].id,
               name: user[0].name,
@@ -53,7 +53,7 @@ const handleUpdateExpense = (req, res, db, updatedAmount, updatedExpense) => {
     .then(data => {
       // if there is data, update the proper column with summed up result,
       // if not, update with 0.
-      if(data.length === 0) {
+      if (data.length === 0) {
         return db('accounts').where({id: req.body.account_id})
           .update(`${updatedAmount}`, 0);
       } else {
@@ -70,7 +70,7 @@ const handleUpdateExpense = (req, res, db, updatedAmount, updatedExpense) => {
     .then(data => {
       // if there is data, update the total_amount column with data.
       // if not, update with 0.
-      if(data[0].total_amount === null) {
+      if (data[0].total_amount === null) {
         return db('accounts').where({id: req.body.account_id})
           .update('total_amount', 0)
           .returning('journey_id')
@@ -88,7 +88,7 @@ const handleUpdateExpense = (req, res, db, updatedAmount, updatedExpense) => {
         .where('journey_id', '=', id[0])
         .returning('*')
         .then(data => {
-          if(data.length === 0) {
+          if (data.length === 0) {
             return db('journeys').where({id: id[0]})
               .update(`${updatedExpense}`, 0)
               .returning('id')
@@ -107,7 +107,7 @@ const handleUpdateExpense = (req, res, db, updatedAmount, updatedExpense) => {
         .where('journey_id', '=', id[0])
         .returning('*')
         .then(data => {
-          if(data.length === 0) {
+          if (data.length === 0) {
             return db('journeys').where({id: id[0]})
               .update('expense', 0)
               .returning('id')
